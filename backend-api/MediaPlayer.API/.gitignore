@@ -1,0 +1,26 @@
+﻿# Build artifacts
+bin/
+obj/
+*.dll
+*.exe
+
+# User-specific files
+*.user
+*.suo
+
+# EF Core local DB
+media.db
+
+# Uploads (mantém a pasta, mas não os arquivos)
+wwwroot/uploads/*
+!wwwroot/uploads/.gitkeep
+
+# Rider, VSCode, etc.
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Visual Studio - configurações locais
+.vs/
