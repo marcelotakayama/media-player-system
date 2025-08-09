@@ -35,7 +35,7 @@ export const updateMedia = async (media: Media): Promise<Media> => {
   return data as Media;
 };
 
-/** (Opcional) Excluir mídia */
+/** Excluir mídia */
 export const deleteMedia = async (id: string): Promise<void> => {
   await axios.delete(`${API_URL}/${id}`);
 };

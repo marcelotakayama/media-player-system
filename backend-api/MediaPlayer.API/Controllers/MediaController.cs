@@ -114,9 +114,35 @@ namespace MediaPlayer.API.Controllers
             var media = await _context.Medias.FindAsync(id);
             if (media == null) return NotFound();
 
+            if (!string.IsNullOrWhiteSpace(media.UrlArquivo))
+            {
+                try
+                {
+                    // ex.: https://localhost:7282/uploads/abc.jpg  -> "/uploads/abc.jpg"
+                    var uri = new Uri(media.UrlArquivo, UriKind.RelativeOrAbsolute);
+                    string relativePath = uri.IsAbsoluteUri ? uri.AbsolutePath : media.UrlArquivo;
+
+                    if (relativePath.StartsWith("/")) relativePath = relativePath[1..];
+
+                    var fullPath = Path.Combine(
+                        Directory.GetCurrentDirectory(),
+                        "wwwroot",
+                        relativePath.Replace('/', Path.DirectorySeparatorChar)
+                    );
+
+                    if (System.IO.File.Exists(fullPath))
+                        System.IO.File.Delete(fullPath);
+                }
+                catch
+                {
+                }
+            }
+
             _context.Medias.Remove(media);
             await _context.SaveChangesAsync();
+
             return NoContent();
         }
+
     }
 }
