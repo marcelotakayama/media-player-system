@@ -72,7 +72,17 @@ namespace MediaPlayer.API.Controllers
             var baseUrl = $"{Request.Scheme}://{Request.Host}";
             var fileUrl = $"{baseUrl}/uploads/{fileName}";
 
-            return Ok(new { url = fileUrl });
+            var media = new Media
+            {
+                Id = Guid.NewGuid(),
+                Nome = Path.GetFileNameWithoutExtension(file.FileName),
+                UrlArquivo = fileUrl
+            };
+
+            _context.Medias.Add(media);
+            await _context.SaveChangesAsync();
+
+            return Ok(media);
         }
 
         // PUT: api/media/{id}
