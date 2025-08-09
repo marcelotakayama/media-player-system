@@ -4,6 +4,7 @@
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Nome { get; set; }
+        public string? Descricao { get; set; }
         public bool ExibirNoPlayer { get; set; }
 
         public ICollection<PlaylistMedia> PlaylistMedias { get; set; } = new List<PlaylistMedia>();
