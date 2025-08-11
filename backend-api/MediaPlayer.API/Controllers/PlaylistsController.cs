@@ -7,13 +7,12 @@ using Microsoft.EntityFrameworkCore;
 namespace MediaPlayer.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")] // => /api/Playlists
+    [Route("api/[controller]")] 
     public class PlaylistsController : ControllerBase
     {
         private readonly AppDbContext _context;
         public PlaylistsController(AppDbContext context) => _context = context;
 
-        // DTOs usados pelos endpoints
         public record PlaylistCreateDto(string Nome, string? Descricao, bool ExibirNoPlayer);
         public record PlaylistUpdateDto(string Nome, string? Descricao, bool ExibirNoPlayer);
         public record UpdateItemsDto(Guid[] MediaIds);
@@ -101,12 +100,10 @@ namespace MediaPlayer.API.Controllers
             var p = await _context.Playlists.FindAsync(id);
             if (p is null) return NotFound();
 
-            _context.Playlists.Remove(p); // vai remover relacionamentos por FK composta
+            _context.Playlists.Remove(p); 
             await _context.SaveChangesAsync();
             return NoContent();
         }
-
-        // --- Itens da playlist -----------------------------
 
         // GET: /api/Playlists/{id}/items
         [HttpGet("{id:guid}/items")]
@@ -133,11 +130,9 @@ namespace MediaPlayer.API.Controllers
                 .FirstOrDefaultAsync(p => p.Id == id);
             if (playlist is null) return NotFound();
 
-            // remove vínculos atuais
             _context.PlaylistMedias.RemoveRange(playlist.PlaylistMedias);
             await _context.SaveChangesAsync();
 
-            // recria na ordem enviada
             var toAdd = dto.MediaIds.Select((mid, idx) => new PlaylistMedia
             {
                 PlaylistId = id,
@@ -149,8 +144,6 @@ namespace MediaPlayer.API.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
-
-        // (OPCIONAIS) Endpoints que você já tinha, com {id:guid} explícito:
 
         // POST: /api/Playlists/{id}/add-media?mediaId=guid
         [HttpPost("{id:guid}/add-media")]

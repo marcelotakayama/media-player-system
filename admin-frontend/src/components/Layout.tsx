@@ -34,7 +34,6 @@ export default function Layout() {
 
   return (
     <AntLayout style={{ minHeight: "100vh", background: "#f5f7fb" }}>
-      {/* HEADER */}
       <Header
         style={{
           position: "sticky",
@@ -46,7 +45,6 @@ export default function Layout() {
           background: "#0b3a5a",
         }}
       >
-        {/* Botão hambúrguer (só no mobile) */}
         {isMobile && (
           <Button
             type="text"
@@ -55,10 +53,8 @@ export default function Layout() {
           />
         )}
 
-        {/* Brand / Título */}
         <div style={{ color: "#fff", fontWeight: 700 }}>Media Player Admin</div>
 
-        {/* Menu horizontal (desktop) */}
         {!isMobile && (
           <Menu
             onClick={onMenuClick}
@@ -71,7 +67,6 @@ export default function Layout() {
         )}
       </Header>
 
-      {/* Drawer (menu mobile) */}
       <Drawer
         title="Navegação"
         placement="left"
@@ -87,7 +82,6 @@ export default function Layout() {
         />
       </Drawer>
 
-      {/* CONTEÚDO */}
       <Content
         style={{
           margin: screens.md ? 16 : 12,

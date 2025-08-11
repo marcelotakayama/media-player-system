@@ -38,7 +38,6 @@ namespace MediaPlayer.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Media>> CreateMedia(Media media)
         {
-            // Se quiser garantir que vem com Id (ou deixar o banco gerar com NEWID()):
             if (media.Id == Guid.Empty) media.Id = Guid.NewGuid();
 
             _context.Medias.Add(media);
@@ -118,7 +117,6 @@ namespace MediaPlayer.API.Controllers
             {
                 try
                 {
-                    // ex.: https://localhost:7282/uploads/abc.jpg  -> "/uploads/abc.jpg"
                     var uri = new Uri(media.UrlArquivo, UriKind.RelativeOrAbsolute);
                     string relativePath = uri.IsAbsoluteUri ? uri.AbsolutePath : media.UrlArquivo;
 

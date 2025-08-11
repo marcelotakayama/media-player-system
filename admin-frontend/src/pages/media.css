@@ -1,0 +1,114 @@
+.media-page {
+  width: 100%;
+}
+
+.media-header {
+  margin: 0 0 12px 0;
+  font-weight: 600;
+  color: var(--ant-color-text);
+}
+
+.upload-drop .ant-upload,
+.upload-drop .ant-upload-list {
+  background: transparent;
+}
+
+.upload-drop .ant-upload-drag {
+  background: var(--ant-color-bg-container);
+  border: 1.5px dashed var(--ant-color-border);
+  color: var(--ant-color-text-secondary);
+  border-radius: 12px;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .12);
+}
+
+.upload-drop .ant-upload-drag:hover,
+.upload-drop .ant-upload-drag.ant-upload-drag-hover {
+  border-color: var(--ant-color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ant-color-primary) 24%, transparent);
+}
+
+.upload-drop .ant-upload-drag-icon { 
+  color: var(--ant-color-primary); 
+}
+.upload-drop .ant-upload-text,
+.upload-drop .ant-upload-hint { 
+  color: var(--ant-color-text-tertiary); 
+}
+
+.media-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  margin-top: 16px;
+}
+
+.media-card {
+  background: var(--ant-color-bg-container);
+  border: 1px solid var(--ant-color-border);
+  border-radius: 12px;
+  padding: 14px;
+  color: var(--ant-color-text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .16);
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease, transform .06s ease;
+}
+
+.media-card:hover {
+  border-color: color-mix(in srgb, var(--ant-color-primary) 38%, var(--ant-color-border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ant-color-primary) 20%, transparent);
+}
+
+.media-name {
+  color: var(--ant-color-text) !important; 
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.media-type {
+  color: var(--ant-color-text-tertiary);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.media-desc {
+  color: var(--ant-color-text-secondary);
+  font-size: 13px;
+  min-height: 32px; 
+}
+
+.muted { 
+  color: var(--ant-color-text-tertiary); 
+}
+
+.media-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.media-actions a {
+  color: var(--ant-color-link);
+  text-underline-offset: 2px;
+}
+
+.media-actions a:hover {
+  color: color-mix(in srgb, var(--ant-color-link) 88%, white);
+}
+
+.media-actions .ant-btn-link {
+  padding-inline: 4px; 
+}
+
+.media-page .ant-upload-list-item {
+  background: var(--ant-color-bg-container);
+  border-color: var(--ant-color-border);
+  color: var(--ant-color-text);
+}
+
+@media (max-width: 576px) {
+  .media-grid { 
+    grid-template-columns: 1fr; 
+  }
+}

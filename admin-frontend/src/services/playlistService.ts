@@ -1,45 +1,38 @@
-// src/services/playlistService.ts
 import axios from "axios";
 
 export type Playlist = {
-  id: number;
+  id: string;                
   nome: string;
-  descricao?: string | null;
-  totalItens?: number; // opcional: retornado pelo backend na lista
-  createdAt?: string;
-  updatedAt?: string;
-};
-
-export type PlaylistItem = {
-  mediaId: number;
-  ordem: number; // 0-based ou 1-based, trate no backend; aqui usamos 0-based
+  descricao?: string | null; 
+  exibirNoPlayer?: boolean;
+  totalItens?: number;
 };
 
 const API = "/api/Playlists";
 
-export async function getPlaylists(): Promise<Playlist[]> {
+export async function getPlaylists(): Promise<Playlist[] | { items?: Playlist[]; data?: Playlist[] }> {
   const { data } = await axios.get(API);
   return data;
 }
 
-export async function createPlaylist(payload: { nome: string; descricao?: string }) {
-  const { data } = await axios.post(API, payload)
-  return data
+export async function createPlaylist(payload: { nome: string; descricao?: string; exibirNoPlayer?: boolean }): Promise<Playlist> {
+  const { data } = await axios.post(API, payload);
+  return data;
 }
 
-export async function updatePlaylist(id: number, payload: { nome: string; descricao?: string }): Promise<void> {
+export async function updatePlaylist(id: string, payload: { nome: string; descricao?: string; exibirNoPlayer?: boolean }): Promise<void> {
   await axios.put(`${API}/${id}`, payload);
 }
 
-export async function deletePlaylist(id: number): Promise<void> {
+export async function deletePlaylist(id: string): Promise<void> {
   await axios.delete(`${API}/${id}`);
 }
 
-export async function getPlaylistItems(id: number): Promise<PlaylistItem[]> {
+export async function getPlaylistItems(id: string): Promise<Array<{ mediaId: string; ordem: number }>> {
   const { data } = await axios.get(`${API}/${id}/items`);
   return data;
 }
 
-export async function updatePlaylistItems(id: number, mediaIds: number[]): Promise<void> {
+export async function updatePlaylistItems(id: string, mediaIds: string[]): Promise<void> {
   await axios.put(`${API}/${id}/items`, { mediaIds });
 }

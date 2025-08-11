@@ -22,13 +22,12 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import "../styles/media.css";
+import "./media.css";
 
 export default function MediaPage() {
   const [medias, setMedias] = useState<Media[]>([]);
   const [uploading, setUploading] = useState(false);
 
-  // edição
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editing, setEditing] = useState<Media | null>(null);
   const [form] = Form.useForm();
@@ -84,68 +83,63 @@ export default function MediaPage() {
   };
 
   return (
-    <div className="p-4">
-      <h3 className="text-xl font-semibold mb-4">📁 Página de Mídias</h3>
+    <div className="media-page">
+      <h3 className="media-header">📁 Página de Mídias</h3>
 
-      {/* Upload (drag-and-drop) controlado */}
-    <Upload.Dragger
+      <Upload.Dragger
+        className="upload-drop"
         name="file"
         multiple={false}
         accept="image/*,video/*,audio/*"
         showUploadList={false}
-        // NÃO use onChange nem beforeUpload aqui
         customRequest={async ({ file, onSuccess, onError }) => {
-            try {
+          try {
             if (uploading) return;
             setUploading(true);
 
-            await uploadMedia(file as File); // sua API
-            await loadMedias();              // recarrega lista
+            await uploadMedia(file as File); 
+            await loadMedias();          
 
             message.success("Mídia enviada com sucesso!");
-            // avisa o antd que deu certo
             onSuccess && onSuccess({}, new XMLHttpRequest());
-            } catch (e: any) {
+          } catch (e: any) {
             console.error(e);
             message.error("Falha ao enviar a mídia.");
             onError && onError(e);
-            } finally {
+          } finally {
             setUploading(false);
-            }
+          }
         }}
         disabled={uploading}
-        style={{ background: "#fafafa", borderRadius: 12 }}
-        >
+      >
         <p className="ant-upload-drag-icon">
-            <InboxOutlined />
+          <InboxOutlined />
         </p>
         <p className="ant-upload-text">
-            Arraste o arquivo para cá ou <b>clique para selecionar</b>
+          Arraste o arquivo para cá ou <b>clique para selecionar</b>
         </p>
         <p className="ant-upload-hint">Imagens, vídeos ou áudios.</p>
 
         <Button
-            icon={<UploadOutlined />}
-            loading={uploading}
-            disabled={uploading}
-            style={{ marginTop: 8 }}
+          icon={<UploadOutlined />}
+          loading={uploading}
+          disabled={uploading}
+          style={{ marginTop: 8 }}
         >
-            Enviar
+          Enviar
         </Button>
-    </Upload.Dragger>
+      </Upload.Dragger>
 
-      {/* Cards */}
-      <div className="media-grid" style={{ marginTop: 16 }}>
+      <div className="media-grid">
         {medias.map((media) => (
           <div key={media.id} className="media-card">
             <div className="media-name">{media.nome}</div>
             <div className="media-type">{media.tipo || "—"}</div>
             <div className="media-desc">
-              {media.descricao || <em>Sem descrição</em>}
+              {media.descricao || <em className="muted">Sem descrição</em>}
             </div>
 
-            {/* Ações: Ver | Editar | Excluir */}
-            <Space size="small" style={{ marginTop: 8 }}>
+            <Space size="small" className="media-actions">
               <a href={media.urlArquivo} target="_blank" rel="noreferrer">
                 Ver arquivo
               </a>
@@ -181,7 +175,6 @@ export default function MediaPage() {
         ))}
       </div>
 
-      {/* Modal de edição */}
       <Modal
         title="Editar mídia"
         open={isModalOpen}
@@ -192,7 +185,7 @@ export default function MediaPage() {
           setIsModalOpen(false);
           setEditing(null);
         }}
-        destroyOnClose
+        destroyOnHidden  
       >
         <Form layout="vertical" form={form}>
           <Form.Item

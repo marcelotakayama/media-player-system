@@ -20,22 +20,16 @@ export const uploadMedia = async (file: File) => {
   return data as { url: string };
 };
 
-/** Busca todas as mídias */
 export const fetchMedias = async (): Promise<Media[]> => {
   const { data } = await axios.get(API_URL);
   return data as Media[];
 };
 
-/**
- * Atualiza uma mídia pelo ID.
- * O backend espera o OBJETO COMPLETO no PUT, então envie todos os campos.
- */
 export const updateMedia = async (media: Media): Promise<Media> => {
   const { data } = await axios.put(`${API_URL}/${media.id}`, media);
   return data as Media;
 };
 
-/** Excluir mídia */
 export const deleteMedia = async (id: string): Promise<void> => {
   await axios.delete(`${API_URL}/${id}`);
 };

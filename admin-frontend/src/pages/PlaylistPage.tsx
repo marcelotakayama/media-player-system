@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Card,
@@ -23,6 +23,7 @@ import {
   FolderAddOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
+  PlayCircleOutlined,
 } from "@ant-design/icons";
 import type { Playlist } from "../services/playlistService";
 import {
@@ -34,10 +35,13 @@ import {
   updatePlaylistItems,
 } from "../services/playlistService";
 import { fetchMedias } from "../services/mediaService";
+import "./playlist.css";
 
 const { Title, Text } = Typography;
 
-// IDs como GUID (string)
+const PLAYER_URL =
+  (import.meta as any).env?.VITE_PLAYER_URL ?? "http://localhost:5174";
+
 type Media = {
   id: string;
   nome: string;
@@ -46,7 +50,6 @@ type Media = {
   tipo: string;
 };
 
-// Normaliza possíveis formatos vindos do backend para string
 function normalizeMedias(arr: any[]): Media[] {
   return (arr || []).map((m: any) => ({
     id: String(m.id),
@@ -70,9 +73,8 @@ export default function PlaylistPage() {
 
   const [selected, setSelected] = useState<Playlist | null>(null);
 
-  // Gerenciar itens
   const [allMedias, setAllMedias] = useState<Media[]>([]);
-  const [playlistMediaIds, setPlaylistMediaIds] = useState<string[]>([]); // ORDENADO (GUIDs)
+  const [playlistMediaIds, setPlaylistMediaIds] = useState<string[]>([]);
   const [search, setSearch] = useState("");
 
   async function fetchPlaylistsSafe() {
@@ -92,10 +94,8 @@ export default function PlaylistPage() {
 
   useEffect(() => {
     fetchPlaylistsSafe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Criar
   const onCreate = async () => {
     try {
       const values = await form.validateFields();
@@ -104,14 +104,17 @@ export default function PlaylistPage() {
       setCreateOpen(false);
       form.resetFields();
       fetchPlaylistsSafe();
-    } catch {/* noop */}
+    } catch {}
   };
 
-  // Editar
   const onOpenEdit = (pl: Playlist) => {
     setSelected(pl);
-    // @ts-expect-error: descricao pode não existir no tipo
-    editForm.setFieldsValue({ nome: pl.nome, descricao: pl.descricao || "", exibirNoPlayer: (pl as any).exibirNoPlayer ?? false });
+    editForm.setFieldsValue({
+      nome: pl.nome,
+
+      descricao: pl.descricao || "",
+      exibirNoPlayer: (pl as any).exibirNoPlayer ?? false,
+    });
     setEditOpen(true);
   };
 
@@ -124,10 +127,9 @@ export default function PlaylistPage() {
       setEditOpen(false);
       setSelected(null);
       fetchPlaylistsSafe();
-    } catch {/* noop */}
+    } catch {}
   };
 
-  // Excluir
   const onDelete = async (pl: Playlist) => {
     try {
       await deletePlaylist(pl.id);
@@ -139,7 +141,6 @@ export default function PlaylistPage() {
     }
   };
 
-  // Abrir gerenciamento de itens
   const onOpenManage = async (pl: Playlist) => {
     setSelected(pl);
     setManageOpen(true);
@@ -156,7 +157,6 @@ export default function PlaylistPage() {
     }
   };
 
-  // Listas derivadas
   const availableMedias = useMemo(() => {
     const lower = search.trim().toLowerCase();
     const notInPlaylist = allMedias.filter((m) => !playlistMediaIds.includes(m.id));
@@ -174,16 +174,13 @@ export default function PlaylistPage() {
     return playlistMediaIds.map((id) => map.get(id)).filter(Boolean) as Media[];
   }, [playlistMediaIds, allMedias]);
 
-  // Ações
   const addToPlaylist = (id: string) => {
     if (playlistMediaIds.includes(id)) return;
     setPlaylistMediaIds((prev) => [...prev, id]);
   };
-
   const removeFromPlaylist = (id: string) => {
     setPlaylistMediaIds((prev) => prev.filter((x) => x !== id));
   };
-
   const moveUp = (index: number) => {
     if (index <= 0) return;
     setPlaylistMediaIds((prev) => {
@@ -192,7 +189,6 @@ export default function PlaylistPage() {
       return clone;
     });
   };
-
   const moveDown = (index: number) => {
     setPlaylistMediaIds((prev) => {
       if (index >= prev.length - 1) return prev;
@@ -205,7 +201,7 @@ export default function PlaylistPage() {
   const onSaveItems = async () => {
     if (!selected) return;
     try {
-      await updatePlaylistItems(selected.id, playlistMediaIds); // GUID[]
+      await updatePlaylistItems(selected.id, playlistMediaIds); 
       message.success("Itens da playlist atualizados");
       setManageOpen(false);
       setSelected(null);
@@ -214,6 +210,11 @@ export default function PlaylistPage() {
       console.error(err);
       message.error(err?.response?.data?.message || "Falha ao salvar itens");
     }
+  };
+
+  const openPreview = (playlistId: string) => {
+    const url = `${PLAYER_URL}/?id=${playlistId}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const gridGutter = { xs: 8, sm: 12, md: 16, lg: 16 } as const;
@@ -233,30 +234,34 @@ export default function PlaylistPage() {
         <Row gutter={[gridGutter.xs, gridGutter.xs]}>
           {playlists.map((pl) => (
             <Col key={pl.id} xs={24} sm={12} md={8} lg={6}>
-              <Card
-                title={<span>{pl.nome}</span>}
-                bordered
-                actions={[
-                  <Space key="actions" style={{ padding: 8 }}>
-                    <Button icon={<FolderAddOutlined />} onClick={() => onOpenManage(pl)}>Gerenciar itens</Button>
-                    <Button icon={<EditOutlined />} onClick={() => onOpenEdit(pl)}>Editar</Button>
-                    <Popconfirm title="Excluir playlist?" okText="Sim" cancelText="Não" onConfirm={() => onDelete(pl)}>
-                      <Button danger icon={<DeleteOutlined />}>Excluir</Button>
-                    </Popconfirm>
-                  </Space>,
-                ]}
-              >
+              <Card title={<span>{pl.nome}</span>} variant="outlined">
                 <Text type="secondary">
-                  {/* @ts-expect-error: descricao pode não existir no tipo */}
                   {pl.descricao || "Sem descrição"}
                 </Text>
+
+                <div className="pl-card-actions">
+                  <Space.Compact block>
+                    <Button type="primary" icon={<PlayCircleOutlined />} onClick={() => openPreview(pl.id)}>
+                      Reproduzir
+                    </Button>
+                    <Button icon={<FolderAddOutlined />} onClick={() => onOpenManage(pl)}>
+                      Gerenciar itens
+                    </Button>
+                    <Button icon={<EditOutlined />} onClick={() => onOpenEdit(pl)}>
+                      Editar
+                    </Button>
+                  </Space.Compact>
+
+                  <Popconfirm title="Excluir playlist?" okText="Sim" cancelText="Não" onConfirm={() => onDelete(pl)}>
+                    <Button danger icon={<DeleteOutlined />} />
+                  </Popconfirm>
+                </div>
               </Card>
             </Col>
           ))}
         </Row>
       )}
 
-      {/* Modal Criar */}
       <Modal
         title="Nova playlist"
         open={createOpen}
@@ -264,7 +269,7 @@ export default function PlaylistPage() {
         onCancel={() => setCreateOpen(false)}
         okText="Criar"
         confirmLoading={loading}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={form} layout="vertical">
           <Form.Item label="Nome" name="nome" rules={[{ required: true, message: "Informe um nome" }]}>
@@ -276,14 +281,13 @@ export default function PlaylistPage() {
         </Form>
       </Modal>
 
-      {/* Modal Editar */}
       <Modal
         title={`Editar: ${selected?.nome ?? ""}`}
         open={editOpen}
         onOk={onSaveEdit}
         onCancel={() => setEditOpen(false)}
         okText="Salvar"
-        destroyOnClose
+        destroyOnHidden
       >
         <Form form={editForm} layout="vertical">
           <Form.Item label="Nome" name="nome" rules={[{ required: true, message: "Informe um nome" }]}>
@@ -295,7 +299,6 @@ export default function PlaylistPage() {
         </Form>
       </Modal>
 
-      {/* Drawer Gerenciar Itens */}
       <Drawer
         title={`Gerenciar itens – ${selected?.nome ?? ""}`}
         open={manageOpen}
@@ -317,7 +320,7 @@ export default function PlaylistPage() {
               onChange={(e) => setSearch(e.target.value)}
               allowClear
             />
-            <div style={{ marginTop: 12, maxHeight: 420, overflow: "auto", border: "1px solid #f0f0f0", borderRadius: 8, padding: 8 }}>
+            <div className="pl-list-box pl-list-available">
               {availableMedias.length === 0 ? (
                 <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Nenhum resultado" />
               ) : (
@@ -345,7 +348,7 @@ export default function PlaylistPage() {
 
           <Col xs={24} md={12}>
             <Title level={5} style={{ marginTop: 0 }}>Na playlist (ordem)</Title>
-            <div style={{ maxHeight: 480, overflow: "auto", border: "1px solid #f0f0f0", borderRadius: 8, padding: 8 }}>
+            <div className="pl-list-box">
               {selectedMedias.length === 0 ? (
                 <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Adicione mídias" />
               ) : (
